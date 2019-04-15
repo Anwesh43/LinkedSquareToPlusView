@@ -11,17 +11,19 @@ import android.app.Activity
 import android.graphics.Paint
 import android.graphics.Canvas
 import android.graphics.Color
+import android.util.Log
 
 val nodes : Int = 5
-val lines : Int = 2
+val lines : Int = 4
 val parts : Int = 2
-val scGap : Float = 0.5f
+val scGap : Float = 0.05f
 val scDiv : Double = 0.51
 val strokeFactor : Int = 90
-val sizeFactor : Float = 2.9f
+val sizeFactor : Float = 3.8f
 val foreColor : Int = Color.parseColor("#673AB7")
 val backColor : Int = Color.parseColor("#BDBDBD")
 val angleDeg : Float = 90f
+val delay : Long = 15
 
 fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
@@ -63,6 +65,9 @@ fun Canvas.drawSTPNode(i : Int, scale : Float, paint : Paint) {
         save()
         rotate(90f * j)
         drawRotatingLine(size, sc1.divideScale(j, lines), sc2.divideScale(j, lines), paint)
+        if (scale > 0) {
+            Log.d("sc1j, sc2j", "${sc1.divideScale(j, lines)}, ${sc2.divideScale(j, lines)}")
+        }
         restore()
     }
     restore()
@@ -90,6 +95,7 @@ class SquareToPlusView(ctx : Context) : View(ctx) {
 
         fun update(cb : (Float) -> Unit) {
             scale += scale.updateValue(dir, lines * parts, lines)
+            Log.d("scale:", "$scale")
             if (Math.abs(scale - prevScale) > 1) {
                 scale = prevScale + dir
                 dir = 0f
@@ -112,7 +118,7 @@ class SquareToPlusView(ctx : Context) : View(ctx) {
             if (animated) {
                 cb()
                 try {
-                    Thread.sleep(50)
+                    Thread.sleep(delay)
                     view.invalidate()
                 } catch(ex : Exception) {
 
