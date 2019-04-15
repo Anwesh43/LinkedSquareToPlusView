@@ -62,7 +62,7 @@ fun Canvas.drawSTPNode(i : Int, scale : Float, paint : Paint) {
     for (j in 0..(lines - 1)) {
         save()
         rotate(90f * j)
-        drawRotatingLine(size, sc1, sc2, paint)
+        drawRotatingLine(size, sc1.divideScale(j, lines), sc2.divideScale(j, lines), paint)
         restore()
     }
     restore()
@@ -81,5 +81,25 @@ class SquareToPlusView(ctx : Context) : View(ctx) {
             }
         }
         return true
+    }
+
+    data class State(var scale : Float = 0f, var dir : Float = 0f, var prevScale : Float = 0f) {
+
+        fun update(cb : (Float) -> Unit) {
+            scale += scale.updateValue(dir, lines * parts, lines)
+            if (Math.abs(scale - prevScale) > 1) {
+                scale = prevScale + dir
+                dir = 0f
+                prevScale = scale
+                cb(prevScale)
+            }
+        }
+
+        fun startUpdating(cb : () -> Unit) {
+            if (dir == 0f) {
+                dir = 1f - 2 * prevScale
+                cb()
+            }
+        }
     }
 }
