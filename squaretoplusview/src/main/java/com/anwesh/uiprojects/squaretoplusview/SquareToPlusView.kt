@@ -198,4 +198,26 @@ class SquareToPlusView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : SquareToPlusView) {
+
+        private val stp : SquareToPlus = SquareToPlus(0)
+        private val animator : Animator = Animator(view)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            stp.draw(canvas, paint)
+            animator.animate {
+                stp.update {i, scl ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            stp.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
