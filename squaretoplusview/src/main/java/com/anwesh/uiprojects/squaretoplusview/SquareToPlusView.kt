@@ -32,4 +32,39 @@ fun Float.mirrorValue(a : Int, b : Int) : Float {
     return (1 - k) * a.inverse() + k * b.inverse()
 }
 fun Float.updateValue(dir : Float, a : Int, b : Int) : Float = mirrorValue(a, b) * scGap * dir
-fun Float.sf() : Float = 1f - 2 * this
+fun Int.sf() : Float = 1f - 2 * this
+
+fun Canvas.drawRotatingLine(size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
+    save()
+    translate(size * (1 - sc2), 0f)
+    for (j in 0..(parts - 1)) {
+        val scj : Float = sc1.divideScale(j, parts)
+        save()
+        rotate(angleDeg * scj * j.sf())
+        drawLine(0f, 0f, 0f,-size * j.sf(), paint)
+        restore()
+    }
+    restore()
+}
+
+fun Canvas.drawSTPNode(i : Int, scale : Float, paint : Paint) {
+    val w : Float = width.toFloat()
+    val h : Float = height.toFloat()
+    val gap : Float = h / (nodes + 1)
+    val size : Float = gap / sizeFactor
+    paint.color = foreColor
+    paint.strokeWidth = Math.min(w, h) / strokeFactor
+    paint.strokeCap = Paint.Cap.ROUND
+    val sc1 : Float = scale.divideScale(0, 2)
+    val sc2 : Float = scale.divideScale(1, 2)
+    save()
+    translate(w / 2, gap * (i + 1))
+    for (j in 0..(lines - 1)) {
+        save()
+        rotate(90f * j)
+        drawRotatingLine(size, sc1, sc2, paint)
+        restore()
+    }
+    restore()
+}
+
